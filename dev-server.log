@@ -1,0 +1,60 @@
+
+> msbte-notes-platform@0.1.0 dev
+> next dev --port 3000
+
+   ▲ Next.js 15.5.19
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.9:3000
+
+ ✓ Starting...
+ ✓ Ready in 4.4s
+ ○ Compiling / ...
+ ✓ Compiled / in 12s (642 modules)
+ GET / 200 in 640ms
+ GET / 200 in 635ms
+ GET / 200 in 549ms
+ ○ Compiling /subjects ...
+ ✓ Compiled /subjects in 1950ms (695 modules)
+ GET / 200 in 1867ms
+ GET /subjects 200 in 4221ms
+ ○ Compiling /subjects/[id] ...
+ ✓ Compiled /subjects/[id] in 836ms (693 modules)
+ GET /subjects/java-programming 200 in 4761ms
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 605ms (699 modules)
+ GET /dashboard 200 in 1994ms
+ ○ Compiling /payment ...
+ ✓ Compiled /payment in 862ms (705 modules)
+ GET /payment?subject=java-programming 200 in 1559ms
+ ○ Compiling /admin/dashboard ...
+ ✓ Compiled /admin/dashboard in 742ms (711 modules)
+ GET /admin/dashboard 200 in 1873ms
+ ○ Compiling /admin/upload ...
+ ✓ Compiled /admin/upload in 970ms (716 modules)
+ GET /admin/upload 200 in 1597ms
+ ○ Compiling /login ...
+ ✓ Compiled /login in 1327ms (721 modules)
+ GET /login 200 in 1980ms
+ ○ Compiling /register ...
+ ✓ Compiled /register in 973ms (723 modules)
+ GET /register 200 in 1836ms
+ ○ Compiling /admin/login ...
+ ✓ Compiled /admin/login in 962ms (725 modules)
+ GET /admin/login 200 in 1738ms
+ GET / 200 in 588ms
+ GET /subjects 200 in 820ms
+ GET /dashboard 200 in 612ms
+ GET / 200 in 536ms
+ GET /subjects 200 in 560ms
+ GET /subjects/java-programming 200 in 513ms
+ GET /dashboard 200 in 853ms
+ GET /payment?subject=java-programming 200 in 398ms
+ GET /admin/dashboard 200 in 607ms
+ GET /admin/upload 200 in 531ms
+ GET /login 200 in 350ms
+ GET /register 200 in 1019ms
+ GET /admin/login 200 in 281ms
+ GET / 200 in 533ms
+ GET /subjects 200 in 716ms
+ GET /dashboard 200 in 770ms
+ GET / 200 in 520ms
