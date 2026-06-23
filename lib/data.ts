@@ -14,6 +14,21 @@ export type Subject = {
   pdf: string;
 };
 
+export type DemoConcept = {
+  id: string;
+  title: string;
+  description: string;
+  isFree: boolean;
+  order: number;
+};
+
+export type DemoChapter = {
+  id: string;
+  title: string;
+  order: number;
+  concepts: DemoConcept[];
+};
+
 export const semesters = [1, 2, 3, 4, 5, 6];
 
 export const subjects: Subject[] = [
@@ -178,4 +193,29 @@ export const dashboardStats = [
 
 export function getSubject(id: string) {
   return subjects.find((subject) => subject.id === id);
+}
+
+export function getSubjectLearningTree(subject: Subject) {
+  return {
+    fullBook: {
+      id: `${subject.id}-full-book`,
+      title: `${subject.title} Full Book`,
+      description: `Complete semester-ready ${subject.title} book with unit-wise notes, diagrams, solved examples, and MSBTE important questions.`,
+      pages: subject.pages,
+      price: subject.price,
+      isFree: subject.isFree,
+    },
+    chapters: [1, 2, 3].map((chapterOrder) => ({
+      id: `${subject.id}-chapter-${chapterOrder}`,
+      title: `Unit ${chapterOrder}: ${["Fundamentals", "Applied Concepts", "Exam Preparation"][chapterOrder - 1]}`,
+      order: chapterOrder,
+      concepts: [1, 2, 3].map((conceptOrder) => ({
+        id: `${subject.id}-chapter-${chapterOrder}-concept-${conceptOrder}`,
+        title: `${["Core Notes", "Solved Examples", "Practice Questions"][conceptOrder - 1]}`,
+        description: `Concise ${subject.title} concept PDF with revision notes and practical exam focus.`,
+        isFree: subject.isFree || conceptOrder === 1,
+        order: conceptOrder,
+      })),
+    })),
+  };
 }

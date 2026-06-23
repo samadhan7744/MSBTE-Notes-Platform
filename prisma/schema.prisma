@@ -1,0 +1,245 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  STUDENT
+  ADMIN
+}
+
+enum PurchaseStatus {
+  ACTIVE
+  REFUNDED
+}
+
+enum PaymentStatus {
+  CREATED
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum SupportTicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model User {
+  id             String           @id @default(cuid())
+  name           String
+  email          String           @unique
+  mobile         String?
+  passwordHash   String
+  role           UserRole         @default(STUDENT)
+  isActive       Boolean          @default(true)
+  refreshTokenHash String?
+  createdAt      DateTime         @default(now())
+  purchases      Purchase[]
+  payments       Payment[]
+  progress       Progress[]
+  recentlyViewed RecentlyViewed[]
+  supportTickets SupportTicket[]
+
+  @@index([role])
+  @@index([isActive])
+  @@index([createdAt])
+}
+
+model Branch {
+  id        String     @id @default(cuid())
+  name      String
+  slug      String     @unique
+  semesters Semester[]
+
+  @@index([slug])
+}
+
+model Semester {
+  id        String    @id @default(cuid())
+  branchId  String
+  name      String
+  number    Int
+  branch    Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  subjects  Subject[]
+
+  @@unique([branchId, number])
+  @@index([branchId])
+  @@index([number])
+}
+
+model Subject {
+  id             String           @id @default(cuid())
+  semesterId     String
+  name           String
+  slug           String           @unique
+  description    String
+  price          Int              @default(0)
+  isFree         Boolean          @default(false)
+  thumbnailUrl   String?
+  semester       Semester         @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  fullBooks      FullBook[]
+  chapters       Chapter[]
+  purchases      Purchase[]
+  payments       Payment[]
+  recentlyViewed RecentlyViewed[]
+
+  @@index([semesterId])
+  @@index([slug])
+  @@index([isFree])
+  @@index([name])
+}
+
+model FullBook {
+  id            String  @id @default(cuid())
+  subjectId     String
+  title         String
+  description   String
+  pdfFileKey    String
+  previewPdfKey String?
+  price         Int     @default(0)
+  isFree        Boolean @default(false)
+  subject       Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([subjectId, title])
+  @@index([subjectId])
+  @@index([isFree])
+}
+
+model Chapter {
+  id        String    @id @default(cuid())
+  subjectId  String
+  title     String
+  order     Int
+  subject   Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  concepts  Concept[]
+
+  @@unique([subjectId, order])
+  @@index([subjectId])
+  @@index([title])
+}
+
+model Concept {
+  id             String           @id @default(cuid())
+  chapterId      String
+  title          String
+  description    String
+  pdfFileKey     String?
+  videoUrl       String?
+  isFree         Boolean          @default(false)
+  order          Int
+  chapter        Chapter          @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  progress       Progress[]
+  recentlyViewed RecentlyViewed[]
+
+  @@unique([chapterId, order])
+  @@index([chapterId])
+  @@index([title])
+  @@index([isFree])
+}
+
+model Purchase {
+  id        String         @id @default(cuid())
+  userId    String
+  subjectId String
+  paymentId String?        @unique
+  status    PurchaseStatus @default(ACTIVE)
+  createdAt DateTime       @default(now())
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject   Subject        @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  payment   Payment?       @relation(fields: [paymentId], references: [id])
+
+  @@unique([userId, subjectId])
+  @@index([subjectId])
+  @@index([status])
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  userId            String
+  subjectId         String
+  provider          String
+  amount            Int
+  status            PaymentStatus @default(CREATED)
+  providerOrderId   String?       @unique
+  providerPaymentId String?       @unique
+  providerSignature String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject           Subject       @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  purchase          Purchase?
+
+  @@index([userId])
+  @@index([subjectId])
+  @@index([status])
+  @@index([provider])
+}
+
+model Progress {
+  id           String    @id @default(cuid())
+  userId       String
+  conceptId    String
+  completed    Boolean   @default(false)
+  lastViewedAt DateTime?
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  concept      Concept   @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, conceptId])
+  @@index([completed])
+  @@index([lastViewedAt])
+}
+
+model RecentlyViewed {
+  id        String   @id @default(cuid())
+  userId    String
+  subjectId String
+  conceptId String?
+  viewedAt  DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  concept   Concept? @relation(fields: [conceptId], references: [id], onDelete: SetNull)
+
+  @@index([userId, viewedAt])
+  @@index([subjectId])
+  @@index([conceptId])
+}
+
+model SupportTicket {
+  id        String              @id @default(cuid())
+  userId    String?
+  name      String
+  email     String
+  mobile    String?
+  category  String
+  message   String
+  status    SupportTicketStatus @default(OPEN)
+  createdAt DateTime            @default(now())
+  user      User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+  @@index([category])
+}
+
+model BlogPost {
+  id              String  @id @default(cuid())
+  title           String
+  slug            String  @unique
+  content         String
+  metaTitle       String?
+  metaDescription String?
+  keywords        String?
+  published       Boolean @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([slug])
+  @@index([published])
+  @@index([title])
+}
